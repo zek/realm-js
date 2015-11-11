@@ -251,6 +251,8 @@
 		F6C3FBBC1BF680EC00E6FFD4 /* json.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = json.hpp; sourceTree = "<group>"; };
 		F6C74DEE1C732CC500C9DDCD /* RealmAnalytics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RealmAnalytics.h; path = "react-native/RealmAnalytics.h"; sourceTree = "<group>"; };
 		F6C74DEF1C732CC500C9DDCD /* RealmAnalytics.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RealmAnalytics.mm; path = "react-native/RealmAnalytics.mm"; sourceTree = "<group>"; };
+		F6EA2B131BEEB8AA00ECDC7B /* RealmCordova.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RealmCordova.h; sourceTree = "<group>"; };
+		F6EA2B141BEEB8AA00ECDC7B /* RealmCordova.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealmCordova.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -351,6 +353,7 @@
 				F6C3FBB41BF680D000E6FFD4 /* Vendor */,
 				0270BC3D1B7CFBFD00010E03 /* RealmJS */,
 				02B58CC01AE99CEC009B348C /* RealmJSTests */,
+				F6EA2B0B1BEEB62E00ECDC7B /* RealmCordova */,
 				0270BCCE1B7D066100010E03 /* RealmReact */,
 				02B58CB21AE99CEC009B348C /* Products */,
 			);
@@ -514,6 +517,16 @@
 			);
 			name = Vendor;
 			path = vendor;
+			sourceTree = "<group>";
+		};
+		F6EA2B0B1BEEB62E00ECDC7B /* RealmCordova */ = {
+			isa = PBXGroup;
+			children = (
+				F6EA2B131BEEB8AA00ECDC7B /* RealmCordova.h */,
+				F6EA2B141BEEB8AA00ECDC7B /* RealmCordova.m */,
+			);
+			name = RealmCordova;
+			path = cordova;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
