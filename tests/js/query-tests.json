@@ -204,6 +204,21 @@
     ]
 },
 
+"unicodeStringTests" : {
+    "schema" : [{ 
+        "name": "StringObject",
+        "properties": [{ "name": "stringCol", "type": "string" }]
+    }],
+    "objects": [
+        { "type": "StringObject", "value": ["паркова"] },
+        { "type": "StringObject", "value": ["Паркова"] }
+    ],
+    "tests": [
+        ["QueryCount", 2, "StringObject", "stringCol CONTAINS[c] 'паркова'"],
+        ["QueryCount", 2, "StringObject", "stringCol CONTAINS[c] 'Паркова'"]
+    ]
+},
+
 "binaryTests" : {
     "schema" : [{ 
         "name": "BinaryObject",

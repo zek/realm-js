@@ -140,6 +140,9 @@ module.exports = {
     testStringQueries: function() { 
         runQuerySuite(testCases.stringTests);
     },
+    testUnicodeStringQueries: function() {
+        runQuerySuite(testCases.unicodeStringTests);
+    },
     testBinaryQueries: function() { 
         runQuerySuite(testCases.binaryTests);
     },
@@ -154,5 +157,6 @@ module.exports = {
     },
     testOptionalQueries: function() {
         runQuerySuite(testCases.optionalTests);
-    }
+    },
+
 };
