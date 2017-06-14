@@ -187,6 +187,7 @@ public:
 
     static void simulate_error(ContextType, FunctionType, ObjectType, size_t, const ValueType[], ReturnValue &);
     static void refresh_access_token(ContextType, FunctionType, ObjectType, size_t, const ValueType[], ReturnValue &);
+    static void wait_for(ContextType, FunctionType, ObjectType, size_t, const ValueType[], ReturnValue &);
 
     PropertyMap<T> const properties = {
         {"config", {wrap<get_config>, nullptr}},
@@ -197,7 +198,8 @@ public:
 
     MethodMap<T> const methods = {
         {"_simulateError", wrap<simulate_error>},
-        {"_refreshAccessToken", wrap<refresh_access_token>}
+        {"_refreshAccessToken", wrap<refresh_access_token>},
+        {"_waitFor", wrap<refresh_access_token>},
     };
 };
 
@@ -325,6 +327,45 @@ void SessionClass<T>::refresh_access_token(ContextType ctx, FunctionType, Object
 }
 
 template<typename T>
+void SessionClass<T>::wait_for(ContextType ctx, FunctionType, ObjectType this_object, size_t argc, const ValueType arguments[], ReturnValue &) {
+    validate_argument_count(argc, 2);
+    
+    if (auto session = get_internal<T, SessionClass<T>>(this_object)->lock()) {
+        std::string direction = Value::validated_to_string(ctx, arguments[0], "direction");
+        FunctionType callback = Value::validated_to_function(ctx, arguments[1], "callback");
+        
+        Protected<FunctionType> protected_callback(ctx, callback);
+        Protected<typename T::GlobalContext> protected_ctx(Context<T>::get_global_context(ctx));
+        Protected<ObjectType> protected_this(ctx, this_object);
+        EventLoopDispatcher<void(std::error_code)> waiter([protected_ctx, protected_this, protected_callback](std::error_code error_code) {
+            HANDLESCOPE
+            if (!error_code) {
+                //success
+                Function<T>::callback(protected_ctx, protected_callback, protected_this, 0, nullptr);
+            }
+            else {
+                //fail
+                ObjectType object = Object::create_empty(protected_ctx);
+                Object::set_property(protected_ctx, object, "message", Value::from_string(protected_ctx, error_code.message()));
+                Object::set_property(protected_ctx, object, "errorCode", Value::from_number(protected_ctx, error_code.value()));
+                
+                ValueType callback_arguments[1];
+                callback_arguments[0] = object;
+                Function<T>::callback(protected_ctx, protected_callback, protected_this, 1, callback_arguments);
+            }
+        });
+        
+        if (direction == "upload") {
+            session->wait_for_upload(std::move(waiter));
+        } else if (direction == "download") {
+            session->wait_for_download(std::move(waiter));
+        } else {
+            throw std::logic_error("The direction can either be 'upload' or 'download'");
+        }
+    }
+}
+    
+template<typename T>
 class SyncClass : public ClassDefinition<T, void *> {
     using GlobalContextType = typename T::GlobalContext;
     using ContextType = typename T::Context;
@@ -343,6 +384,7 @@ public:
     static FunctionType create_constructor(ContextType);
 
     static void set_sync_log_level(ContextType, FunctionType, ObjectType, size_t, const ValueType[], ReturnValue &);
+    static void get_or_create_session(ContextType, FunctionType, ObjectType, size_t, const ValueType[], ReturnValue &);
 
     // private
     static void populate_sync_config(ContextType, ObjectType realm_constructor, ObjectType config_object, Realm::Config&);
@@ -352,6 +394,7 @@ public:
 
     MethodMap<T> const static_methods = {
         {"setLogLevel", wrap<set_sync_log_level>},
+        {"getOrCreateSession", wrap<get_or_create_session>},
     };
 };
 
@@ -385,15 +428,39 @@ void SyncClass<T>::set_sync_log_level(ContextType ctx, FunctionType, ObjectType 
 }
 
 template<typename T>
-void SyncClass<T>::populate_sync_config(ContextType ctx, ObjectType realm_constructor, ObjectType config_object, Realm::Config& config)
+void SyncClass<T>::get_or_create_session(ContextType ctx, FunctionType, ObjectType this_object, size_t argc, const ValueType arguments[], ReturnValue &return_value) {
+    validate_argument_count_at_least(argc, 1);
+    
+    ObjectType config_object = Value::validated_to_object(ctx, arguments[0], "config");
+    Realm::Config config;
+    
+    static const String encryption_key_string = "encryptionKey";
+    ValueType encryption_key_value = Object::get_property(ctx, config_object, encryption_key_string);
+    if (!Value::is_undefined(ctx, encryption_key_value)) {
+        NativeAccessor<T> accessor(ctx);
+        auto encryption_key = accessor.template unbox<BinaryData>(encryption_key_value);
+        config.encryption_key.assign(encryption_key.data(), encryption_key.data() + encryption_key.size());
+    }
+    
+    populate_sync_config(ctx, this_object, config_object, config);
+    
+    if (argc == 2) {
+        config.path = Value::validated_to_string(ctx, arguments[1], "path");
+    }
+    
+    auto session = SyncManager::shared().get_session(config.path, *config.sync_config);
+    return_value.set(create_object<T, SessionClass<T>>(ctx, new WeakSession(session)));
+}
+    
+template<typename T>
+void SyncClass<T>::populate_sync_config(ContextType ctx, ObjectType sync_constructor, ObjectType config_object, Realm::Config& config)
 {
     ValueType sync_config_value = Object::get_property(ctx, config_object, "sync");
     if (Value::is_boolean(ctx, sync_config_value)) {
         config.force_sync_history = Value::to_boolean(ctx, sync_config_value);
     } else if (!Value::is_undefined(ctx, sync_config_value)) {
         auto sync_config_object = Value::validated_to_object(ctx, sync_config_value);
-
-        ObjectType sync_constructor = Object::validated_get_object(ctx, realm_constructor, std::string("Sync"));
+        
         Protected<ObjectType> protected_sync(ctx, sync_constructor);
         Protected<typename T::GlobalContext> protected_ctx(Context<T>::get_global_context(ctx));
 
