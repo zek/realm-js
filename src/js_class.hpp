@@ -28,7 +28,7 @@ namespace realm {
 namespace js {
 
 template<typename T>
-using ConstructorType = void(typename T::Context, typename T::Object, size_t, const typename T::Value[]);
+using ConstructorType = void(typename T::Context, typename T::Function, typename T::Object, size_t, const typename T::Value[]);
 
 template<typename T>
 using MethodType = void(typename T::Context, typename T::Function, typename T::Object, size_t, const typename T::Value[], ReturnValue<T> &);

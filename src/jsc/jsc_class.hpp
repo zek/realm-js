@@ -228,7 +228,7 @@ inline JSValueRef ObjectWrap<ClassType>::call(JSContextRef ctx, JSObjectRef func
     // Classes without a constructor should still be subclassable.
     if (reinterpret_cast<void*>(s_class.constructor)) {
         try {
-            s_class.constructor(ctx, this_object, argc, arguments);
+            s_class.constructor(ctx, function, this_object, argc, arguments);
         }
         catch (std::exception &e) {
             *exception = jsc::Exception::value(ctx, e);
@@ -248,7 +248,7 @@ inline JSObjectRef ObjectWrap<ClassType>::construct(JSContextRef ctx, JSObjectRe
 
     JSObjectRef this_object = create_instance(ctx);
     try {
-        s_class.constructor(ctx, this_object, argc, arguments);
+        s_class.constructor(ctx, constructor, this_object, argc, arguments);
     }
     catch (std::exception &e) {
         *exception = jsc::Exception::value(ctx, e);

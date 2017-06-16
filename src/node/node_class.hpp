@@ -237,7 +237,7 @@ inline void ObjectWrap<ClassType>::construct(const v8::FunctionCallbackInfo<v8::
         wrap->Wrap(this_object);
 
         try {
-            s_class.constructor(isolate, this_object, arguments.size(), arguments.data());
+            s_class.constructor(isolate, info.Callee(), this_object, arguments.size(), arguments.data());
         }
         catch (std::exception &e) {
             Nan::ThrowError(node::Exception::value(isolate, e));

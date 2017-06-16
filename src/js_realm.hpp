@@ -187,7 +187,7 @@ public:
 #endif
 
     // static methods
-    static void constructor(ContextType, ObjectType, size_t, const ValueType[]);
+    static void constructor(ContextType, FunctionType, ObjectType, size_t, const ValueType[]);
     static SharedRealm create_shared_realm(ContextType, realm::Realm::Config, bool, ObjectDefaultsMap &&, ConstructorMap &&);
 
     static void schema_version(ContextType, FunctionType, ObjectType, size_t, const ValueType[], ReturnValue &);
@@ -327,7 +327,7 @@ static inline void convert_outdated_datetime_columns(const SharedRealm &realm) {
 }
 
 template<typename T>
-void RealmClass<T>::constructor(ContextType ctx, ObjectType this_object, size_t argc, const ValueType arguments[]) {
+void RealmClass<T>::constructor(ContextType ctx, FunctionType constructor_function, ObjectType this_object, size_t argc, const ValueType arguments[]) {
     realm::Realm::Config config;
     ObjectDefaultsMap defaults;
     ConstructorMap constructors;
@@ -353,7 +353,7 @@ void RealmClass<T>::constructor(ContextType ctx, ObjectType this_object, size_t 
             }
 
 #if REALM_ENABLE_SYNC
-            SyncClass<T>::populate_sync_config(ctx, Value::validated_to_object(ctx, Object::get_property(ctx, this_object, "Sync")), object, config);
+            SyncClass<T>::populate_sync_config(ctx, Value::validated_to_object(ctx, Object::get_property(ctx, constructor_function, "Sync")), object, config);
 #endif
 
             static const String path_string = "path";
