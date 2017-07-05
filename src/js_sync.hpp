@@ -26,6 +26,7 @@
 #include "platform.hpp"
 #include "js_class.hpp"
 #include "js_collection.hpp"
+#include "js_sync_logger.hpp"
 #include "sync/sync_manager.hpp"
 #include "sync/sync_config.hpp"
 #include "sync/sync_session.hpp"
@@ -325,6 +326,7 @@ public:
     static FunctionType create_constructor(ContextType);
 
     static void set_sync_log_level(ContextType, FunctionType, ObjectType, size_t, const ValueType[], ReturnValue &);
+    static void set_sync_logger(ContextType, FunctionType, ObjectType, size_t, const ValueType[], ReturnValue &);
 
     // private
     static void populate_sync_config(ContextType, ObjectType realm_constructor, ObjectType config_object, Realm::Config&);
@@ -334,6 +336,7 @@ public:
 
     MethodMap<T> const static_methods = {
         {"setLogLevel", wrap<set_sync_log_level>},
+        {"setLogger", wrap<set_sync_logger>},
     };
 };
 
@@ -367,6 +370,15 @@ void SyncClass<T>::set_sync_log_level(ContextType ctx, FunctionType, ObjectType 
 }
 
 template<typename T>
+void SyncClass<T>::set_sync_logger(ContextType ctx, FunctionType, ObjectType this_object, size_t argc, const ValueType arguments[], ReturnValue &return_value) {
+    validate_argument_count(argc, 1);
+    FunctionType callback = Value::validated_to_function(ctx, arguments[0], "loggerCallback");
+    
+    auto* factory = new JSLoggerFactory<T>(ctx, callback);
+    realm::SyncManager::shared().set_logger_factory(*factory);
+}
+
+template<typename T>
 void SyncClass<T>::populate_sync_config(ContextType ctx, ObjectType realm_constructor, ObjectType config_object, Realm::Config& config)
 {
     ValueType sync_config_value = Object::get_property(ctx, config_object, "sync");
@@ -377,7 +389,7 @@ void SyncClass<T>::populate_sync_config(ContextType ctx, ObjectType realm_constr
 
         ObjectType sync_constructor = Object::validated_get_object(ctx, realm_constructor, std::string("Sync"));
         Protected<ObjectType> protected_sync(ctx, sync_constructor);
-        Protected<typename T::GlobalContext> protected_ctx(Context<T>::get_global_context(ctx));
+        Protected<GlobalContextType> protected_ctx(Context<T>::get_global_context(ctx));
 
         EventLoopDispatcher<SyncBindSessionHandler> bind([protected_ctx, protected_sync](const std::string& path, const realm::SyncConfig& config, std::shared_ptr<SyncSession>) {
             HANDLESCOPE
