@@ -57,7 +57,10 @@
       "type": "none",
       "dependencies": [ "realm-core" ],
       "direct_dependent_settings": {
-        "libraries": [ "-lrealm-sync-node<(debug_library_suffix)" ]
+        # openssl version 1.0.2 works.
+        # We need to link statically against the archives lissl.a libcrypto.a built with -fPIC.
+        # Replace OPENSSL_LOCATION with the right location.
+        "libraries": [ "-lrealm-sync-node<(debug_library_suffix) OPENSSL_LOCATION/libssl.a OPENSSL_LOCATION/libcrypto.a" ]
       },
       "all_dependent_settings": {
         "defines": [ "REALM_ENABLE_SYNC=1" ]
