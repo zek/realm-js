@@ -10,7 +10,8 @@ X.Y.Z Release notes
 * Fix a bug where `Realm.open` could unexpectedly raise a "Realm at path ... already opened with different schema version" error.
 
 ### Internal
-* None
+* Updated to Realm Core 5.0.1.
+* Updated to Realm Sync 2.2.1.
 
 2.1.1 Release notes (2017-12-15)
 =============================================================
