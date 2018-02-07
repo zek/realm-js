@@ -1,3 +1,23 @@
+2.3.0 Release notes (2018-2-6)
+=============================================================
+### Breaking changes
+* Sync protocol changed to version 24.
+* History schema format for server-side Realm files bumped to version 4. This means that after the server has been upgraded, it cannot be downgraded again without restoring state from backup.
+* Backup protocol version bumped to 2. No compatibility with earlier versions of the backup protocol is provided.
+
+### Enhancements
+* Reduced initial download times in Realms with long transaction histories.
+* Wait for pending notifications to complete when removing a sync listener (1648).
+* Further enhancements of the query parser.
+
+### Bug fixes
+* None.
+
+### Internal
+* Updated to Realm Core 5.2.0.
+* Updated to Realm Sync 3.0.0-alpha.4.
+* Tested against Realm Object Server 3.0.0-alpha.1.
+
 2.2.6 Release notes (2018-1-26)
 =============================================================
 ### Breaking changes

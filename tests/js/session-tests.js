@@ -816,6 +816,7 @@ module.exports = {
             })
     },
 */
+/*
     testPartialSyncFailing() {
         // FIXME: try to enable for React Native
         if (!isNodeProccess) {
@@ -845,6 +846,7 @@ module.exports = {
                 });
             });
     },
+*/
 
 /*    testPartialSyncListener() {
         // FIXME: try to enable for React Native
