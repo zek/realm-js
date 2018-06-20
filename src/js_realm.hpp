@@ -238,6 +238,7 @@ public:
     static void object_for_object_id(ContextType, ObjectType, Arguments, ReturnValue&);
     static void privileges(ContextType, ObjectType, Arguments, ReturnValue&);
     static void compute_size(ContextType, ObjectType, Arguments, ReturnValue&);
+    static void optimize_table(ContextType, ObjectType, Arguments, ReturnValue&);
 
     // properties
     static void get_empty(ContextType, ObjectType, ReturnValue &);
@@ -298,6 +299,7 @@ public:
         {"privileges", wrap<privileges>},
         {"computeSize", wrap<compute_size>},
         {"_objectForObjectId", wrap<object_for_object_id>},
+        {"_optimizeTable", wrap<optimize_table>},
  #if REALM_ENABLE_SYNC
         {"_waitForDownload", wrap<wait_for_download_completion>},
  #endif
@@ -1184,6 +1186,20 @@ void RealmClass<T>::compute_size(ContextType ctx, ObjectType this_object, Argume
 
     SharedRealm realm = *get_internal<T, RealmClass<T>>(this_object);
     return_value.set(Value::from_number(ctx, realm->compute_size()));
+}
+
+template<typename T>
+void RealmClass<T>::optimize_table(ContextType ctx, ObjectType this_object, Arguments args, ReturnValue&) {
+    args.validate_maximum(1);
+
+    SharedRealm realm = *get_internal<T, RealmClass<T>>(this_object);
+    auto& object_schema = validated_object_schema_for_value(ctx, realm, args[0]);
+    realm->verify_open();
+    if (!realm->is_in_transaction()) {
+        throw std::runtime_error("Can only optimize tables within a transaction.");
+    }
+
+    ObjectStore::table_for_object_type(realm->read_group(), object_schema.name)->optimize();
 }
 
 } // js
