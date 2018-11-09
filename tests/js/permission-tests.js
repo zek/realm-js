@@ -106,6 +106,16 @@ function permissionForPath(permissions, path) {
     }
 }
 
+function assertAllPrivileges(permission, state) {
+    TestCase.assertEqual(state, permission.canCreate);
+    TestCase.assertEqual(state, permission.canRead);
+    TestCase.assertEqual(state, permission.canUpdate);
+    TestCase.assertEqual(state, permission.canDelete);
+    TestCase.assertEqual(state, permission.canQuery);
+    TestCase.assertEqual(state, permission.canModifySchema);
+    TestCase.assertEqual(state, permission.canSetPermissions);
+}
+
 const getPartialRealm = () => {
     const testID = uuid();
     return Realm.Sync.User
@@ -123,15 +133,6 @@ const getPartialRealm = () => {
         .then(waitForDownload)
 };
 
-const assertFullAccess = function(permission) {
-    TestCase.assertTrue(permission.canCreate);
-    TestCase.assertTrue(permission.canRead);
-    TestCase.assertTrue(permission.canUpdate);
-    TestCase.assertTrue(permission.canDelete);
-    TestCase.assertTrue(permission.canQuery);
-    TestCase.assertTrue(permission.canModifySchema);
-    TestCase.assertTrue(permission.canSetPermissions);
-}
 
 module.exports = {
     testApplyAndGetGrantedPermissions() {
@@ -403,13 +404,7 @@ module.exports = {
             realm.write(() => {
                 let permissions = realmPermissions.findOrCreate("foo");
                 TestCase.assertEqual("foo", permissions.role.name);
-                TestCase.assertFalse(permissions.canCreate);
-                TestCase.assertFalse(permissions.canRead);
-                TestCase.assertFalse(permissions.canUpdate);
-                TestCase.assertFalse(permissions.canDelete);
-                TestCase.assertFalse(permissions.canQuery);
-                TestCase.assertFalse(permissions.canModifySchema);
-                TestCase.assertFalse(permissions.canSetPermissions);
+                assertAllPrivileges(permissions, false);
                 TestCase.assertEqual(3, realm.objects('__Role').length); // [ "everyone", "__User:xxx", "foo" ]
             });
         });
@@ -423,13 +418,7 @@ module.exports = {
                 let permissions = classPermissions.findOrCreate("foo");
                 TestCase.assertEqual("foo", permissions.role.name);
                 TestCase.assertEqual(0, permissions.role.members.length);
-                TestCase.assertFalse(permissions.canCreate);
-                TestCase.assertFalse(permissions.canRead);
-                TestCase.assertFalse(permissions.canUpdate);
-                TestCase.assertFalse(permissions.canDelete);
-                TestCase.assertFalse(permissions.canQuery);
-                TestCase.assertFalse(permissions.canModifySchema);
-                TestCase.assertFalse(permissions.canSetPermissions);
+                assertAllPrivileges(permissions, false);
                 TestCase.assertEqual(3, realm.objects('__Role').length); // [ "everyone", "__User:xxx", "foo" ]
             });
         });
@@ -450,7 +439,7 @@ module.exports = {
             TestCase.assertEqual(1, permissions.permissions.length);
             let perm = permissions.permissions[0];
             TestCase.assertEqual("everyone", perm.role.name);
-            assertFullAccess(perm);
+            assertAllPrivileges(perm, true);
         });
     },
 
@@ -476,5 +465,20 @@ module.exports = {
             TestCase.assertThrows(() => realm.permissions('foo'));
         });
     },
+
+    testPermissions_setAllPrivileges: function() {
+        return getPartialRealm().then(realm => {
+            let permissions = realm.permissions('__Class').findOrCreate("foo");
+            assertAllPrivileges(permissions, false);
+            realm.write(() => {
+                permissions.enableAllPrivileges();
+                assertAllPrivileges(permissions, true);
+                permissions.disableAllPrivileges();
+                assertAllPrivileges(permissions, false);
+            });
+        });
+    },
+
+
 
 };

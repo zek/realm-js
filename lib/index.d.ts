@@ -584,7 +584,6 @@ declare namespace Realm.Sync {
 declare namespace Realm.Permissions {
     class Permission {
         static schema: ObjectSchema;
-
         identity: string;
         canCreate: boolean;
         canRead: boolean;
@@ -593,6 +592,8 @@ declare namespace Realm.Permissions {
         canQuery: boolean;
         canModifySchema: boolean;
         canSetPermissions: boolean;
+        enableAllPrivileges(): void;
+        disableAllPrivileges(): void;
     }
 
     class User {

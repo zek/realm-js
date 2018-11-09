@@ -312,6 +312,17 @@ class Permission {
      * @type {boolean}
      */
     get canModifySchema() {}
+
+
+    /**
+     * Enables all privileges.
+     */
+    enableAllPrivileges() {}
+
+    /**
+     * Disables all privileges
+     */
+    disableAllPrivileges() {}
 }
 
 /**

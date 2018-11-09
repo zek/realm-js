@@ -15,6 +15,23 @@ x.x.x Release notes (yyyy-MM-dd)
  ### Internal
 * None.
 
+2.20.0 Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* Adds `Permission.enableAllPrivileges()` and `Permission.disableAllPrivileges()` for easier defining fine-grained permissions.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
+* None.
+
+### Compatibility
+* Realm Object Server: 3.11.0 or later.
+* APIs are backwards compatible with all previous release of realm in the 2.x.y series.
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+
+ ### Internal
+* None.
+
 2.19.0 Release notes (2018-11-8)
 =============================================================
 This release contains all changes from v2.19.0-rc.1 to v2.19.0-rc.5.
