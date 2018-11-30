@@ -389,6 +389,30 @@ module.exports = {
     });
   },
 
+  testSerializeDeserializeAdminToken() {
+    const credentials = Realm.Sync.Credentials.adminToken("eyJhcHBfaW...");
+    return Realm.Sync.User.login('http://localhost:9080', credentials).then((user) => {
+      TestCase.assertTrue(user.isAdmin);
+      TestCase.assertTrue(user.isAdminToken);
+      TestCase.assertEqual(user.server, 'http://localhost:9080');
+      TestCase.assertEqual(user.token, "eyJhcHBfaW...");
+
+      const serialized = user.serialize();
+      TestCase.assertTrue(serialized.isAdmin);
+      TestCase.assertTrue(serialized.isAdminToken);
+      TestCase.assertEqual(serialized.identity, user.identity);
+      TestCase.assertEqual(serialized.server, 'http://localhost:9080');
+      TestCase.assertEqual(serialized.refreshToken, user.token);
+
+      const deserialized = Realm.Sync.User.deserialize(serialized);
+      TestCase.assertTrue(deserialized.isAdmin);
+      TestCase.assertTrue(deserialized.isAdminToken);
+      TestCase.assertEqual(deserialized.identity, user.identity);
+      TestCase.assertEqual(deserialized.server, 'http://localhost:9080');
+      TestCase.assertEqual(deserialized.token, user.token);
+    });
+  },
+
   testDeserialize() {
     return Realm.Sync.User.login('http://localhost:9080', Realm.Sync.Credentials.anonymous())
       .then((user) => {
