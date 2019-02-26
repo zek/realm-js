@@ -52,7 +52,7 @@ function shouldSkip(filter) {
  * value for that single property.
  */
 function skipIf(filter, title, callback) {
-    if (typeof filter === 'string') {
+    if (typeof filter === "string") {
         return skipIf({ [filter]: true }, title, callback);
     } else if (Array.isArray(filter)) {
         const filterObject = {};
