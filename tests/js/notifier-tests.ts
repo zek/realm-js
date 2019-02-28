@@ -190,7 +190,7 @@ function createRealmAndChangeListener() {
     ]);
 }
 
-describe('Notifier', () => {
+xdescribe('Notifier', () => {
     beforeEach(function() {
         this.tmpListenerDir = tmp.dirSync({ unsafeCleanup: true });
         Realm.Sync.setListenerDirectory(this.tmpListenerDir.name);
@@ -768,11 +768,15 @@ describe('Multi-process Notifier', () => {
         await Realm.Sync.removeAllListeners();
         await worker.stop();
         if (rosController) {
+            console.log('rosController.shutdown')
             await rosController.shutdown();
         }
+        console.log('removeCallback', this.tmpListenerDir.name);
         this.tmpListenerDir.removeCallback();
+        console.log('removeCallback 2', this.tmpIpcDir.name);
         this.tmpIpcDir.removeCallback();
         rosController = undefined;
+        console.log('clearTestState')
         Realm.clearTestState();
     });
 

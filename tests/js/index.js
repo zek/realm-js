@@ -60,8 +60,9 @@ if (global.enableSyncTests) {
     if (isNodeProcess) {
         // FIXME: Permission tests currently fail in react native
         TESTS.PermissionTests = require('./permission-tests');
+        TESTS = {};
 
-        require('./adapter-tests');
+        // require('./adapter-tests');
         require('./notifier-tests');
     }
 }

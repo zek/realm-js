@@ -26,6 +26,8 @@
 #include "sync/sync_user.hpp"
 #endif
 
+#include <iostream>
+
 namespace realm {
 namespace js {
 
@@ -55,6 +57,7 @@ void clear_test_state() {
 #if REALM_ENABLE_SYNC
     auto remove_test_files = [] {
         if (!s_test_files_path.empty()) {
+            std::cerr << "Removing " << s_test_files_path << "\n";
             util::remove_dir_recursive(s_test_files_path);
         }
     };
@@ -68,6 +71,7 @@ void clear_test_state() {
         atexit(remove_test_files);
     }
     s_test_files_path = util::make_temp_dir();
+    std::cerr << "SyncManager root: " << s_test_files_path << "\n";
     SyncManager::shared().configure(s_test_files_path, SyncManager::MetadataMode::NoEncryption);
 #endif
 }

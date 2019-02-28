@@ -355,6 +355,9 @@ case "$TARGET" in
   pushd "$SRCROOT/tests"
   npm ci
   npm run test
+  npm run test
+  npm run test
+  npm run test
   popd
   stop_server
   ;;

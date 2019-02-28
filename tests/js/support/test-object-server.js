@@ -24,6 +24,7 @@ const token = {
 };
 
 function deleteFolderRecursive(path) {
+    console.log('Deleting ', path);
   if(fs.existsSync(path)) {
     fs.readdirSync(path).forEach(function(file, index){
       var curPath = path + "/" + file;
@@ -108,6 +109,7 @@ global.TestObjectServer = module.exports = class TestObjectServer extends EventE
                                                Realm.Sync.Credentials.adminToken(this.adminToken));
 
         this._temp = tmp.dirSync({ unsafeCleanup: true});
+        console.log('TestObjectServer running in ', this._temp.name);
         fs.writeFileSync(path.join(this._temp.name, 'public.pem'), this._key.exportKey('public'));
         this._writeConfiguration();
 
@@ -123,6 +125,7 @@ global.TestObjectServer = module.exports = class TestObjectServer extends EventE
 
     start() {
         deleteFolderRecursive('realm-object-server');
+        mkdirp.sync('realm-object-server/io.realm.object-server-utility/metadata');
 
         return this._server.start().then(() => {
             return Realm.open({
@@ -140,20 +143,26 @@ global.TestObjectServer = module.exports = class TestObjectServer extends EventE
     }
 
     shutdown() {
+        console.log('TestObjectServer shutdown');
         let promise;
         if (this.adminRealm) {
+            console.log('TestObjectServer waitForUpload');
             promise = waitForUpload(this.adminRealm);
+            console.log('TestObjectServer close');
             this.adminRealm.close();
         }
         else {
             promise = Promise.resolve();
         }
         return promise.then(() => {
+            console.log('TestObjectServer stopping');
             this._proxy.stopping = true;
             return this._server.stop();
         }).then(() => {
+            console.log('TestObjectServer stopped');
             this._server = null;
             this._proxy.stop();
+            console.log('TestObjectServer deleting ', this._temp.name);
             this._temp.removeCallback();
             deleteFolderRecursive('realm-object-server');
         });
