@@ -105,7 +105,6 @@ stage('test') {
   parallel parallelExecutors
 }
 
-/*
 stage('build') {
   parallelExecutors = [:]
   for (def nodeVersion in nodeVersions) {
@@ -121,6 +120,7 @@ stage('build') {
   parallel parallelExecutors
 }
 
+/*
 stage('integration tests') {
   parallel(
     'React Native on Android': ReactNativeTests.onAndroid(),
