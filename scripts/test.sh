@@ -69,6 +69,7 @@ stop_server() {
   if [[ ${SERVER_PID} -gt 0 ]] ; then
     echo server is running. killing it
     kill -9 ${SERVER_PID} >/dev/null 2>&1  || true
+    wait ${SERVER_PID} >/dev/null 2>&1 || true # wait may fail if the server exits fast enough
   fi
 }
 
@@ -268,8 +269,10 @@ case "$TARGET" in
 "react-tests")
   npm run check-environment
   set_nvm_default
+  npm ci
   download_server
   start_server
+
   pushd tests/react-test-app
   npm ci
   ./node_modules/.bin/install-local
@@ -284,9 +287,10 @@ case "$TARGET" in
 "react-example")
   npm run check-environment
   set_nvm_default
-  pushd examples/ReactExample
-
   npm ci
+
+  pushd examples/ReactExample
+  npm install --no-save
   ./node_modules/.bin/install-local
   open_chrome
   start_packager
