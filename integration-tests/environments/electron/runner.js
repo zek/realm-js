@@ -24,7 +24,7 @@ const path = require("path");
 const { MochaRemoteServer } = require("mocha-remote-server");
 
 // Adjust this as the expected execution time increases
-const TIMEOUT_MS = 1000 * 30; // 30 seconds
+const TIMEOUT_MS = 1000 * 90; // 30 seconds
 
 const appPaths = {
     darwin: "dist/mac/realm-electron-tests.app/Contents/MacOS/realm-electron-tests",
