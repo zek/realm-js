@@ -1,0 +1,19 @@
+Merge in most of realm-js-private
+
+An overview of these changes:
+
+The JS bindings and tests for the adapter and global notifier are now here, along with a few assorted functions which didn't realy have any reason to be in realm-js-private to begin with. The adapter and global notifier themselves are now in object store.
+
+All of the stuff around building with sync enabled on only macOS or non-linux (depending on where the check happened to be made) is gone as that was a relic of Developer Edition.
+
+The real build system for node is now here. Previous there were two seperate gyp build systems (one here and one in realm-js-private) and we ran the tests against the one here but built releases with the other one. Unsurprisingly this resulted in the tests failing to catch build-system related issues and was a giant headache.
+
+All of the release packaging stuff in the Jenkinsfile is now here.
+
+A bunch of assorted test updates:
+1. Upgraded from jasmine 2 to jasmine 3
+2. ROS is now run via a custom launcher script like cocoa and java did already to let us customize ROS setup more. In particular, this lets us actually enable and test JWT auth.
+3. Tests now put all their files in various temporary directories rather than dumping a bunch of stuff in the realm-js repo.
+4. Integration tests for node and electron now test the actual node-pre-gyp binary that'll be uploaded to S3 rather than building it from source. Building from source for local testing is still supported, and the react-native integration tests always build from source (since we don't package prebuilt binaries for that).
+5. Fixed some flakey and broken tests. Turns out a lot of the tests relied on specific timing to work without anything enforcing that ordering.
+6. A bunch of Dockerfile updates: previously realm-js used an image based on Ubuntu, while realm-js-private used a CentOS base image, and neither supported everything our test/packaging scripts needed. They've now been combined into a single centos-based image. The Android image remains separate.
