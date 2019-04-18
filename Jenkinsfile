@@ -54,6 +54,7 @@ stage('check') {
   }
 }
 
+/*
 stage('test') {
   parallelExecutors = [:]
   parallelExecutors["eslint"] = testLinux('eslint-ci', 10, {
@@ -113,16 +114,17 @@ stage('build') {
   parallelExecutors["Android React Native"] = buildAndroid()
   parallel parallelExecutors
 }
+*/
 
 stage('integration tests') {
   parallel(
     'React Native on Android':  inAndroidContainer { reactNativeIntegrationTests(it, 'android') },
-    'React Native on iOS':      buildMacOS { reactNativeIntegrationTests(it, 'ios') },
-    'Electron on Mac':          buildMacOS { electronIntegrationTests('4.1.4', it) },
-    'Electron on Linux':        buildLinux { electronIntegrationTests('4.1.4', it) },
-    'Node.js v10 on Mac':       buildMacOS { nodeIntegrationTests('10.15.1', it) },
-    'Node.js v8 on Linux':      buildLinux { nodeIntegrationTests('8.15.0', it) },
-    'Node.js v10 on Linux':     buildLinux { nodeIntegrationTests('10.15.1', it) }
+    // 'React Native on iOS':      buildMacOS { reactNativeIntegrationTests(it, 'ios') },
+    // 'Electron on Mac':          buildMacOS { electronIntegrationTests('4.1.4', it) },
+    // 'Electron on Linux':        buildLinux { electronIntegrationTests('4.1.4', it) },
+    // 'Node.js v10 on Mac':       buildMacOS { nodeIntegrationTests('10.15.1', it) },
+    // 'Node.js v8 on Linux':      buildLinux { nodeIntegrationTests('8.15.0', it) },
+    // 'Node.js v10 on Linux':     buildLinux { nodeIntegrationTests('10.15.1', it) }
   )
 }
 
